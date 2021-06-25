@@ -6,7 +6,7 @@ cluster = MongoClient(url)
 db = cluster["test"]
 collection = db["testCollection"]
 
-wb = openpyxl.load_workbook("xltoMongo/Report.xlsx")
+wb = openpyxl.load_workbook("excelToMongoDB/Report.xlsx")
 sheets = wb.sheetnames
 S = len(sheets)
 
