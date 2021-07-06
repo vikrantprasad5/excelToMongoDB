@@ -1,12 +1,11 @@
 import openpyxl
 import pymongo
 from pymongo import MongoClient
-url = "mongodb://localhost:27017/testDB"
+url = "mongodb://localhost:27017/ccs"
 cluster = MongoClient(url)
-db = cluster["test"]
-collection = db["testCollection"]
-
-wb = openpyxl.load_workbook("excelToMongoDB/Report.xlsx")
+db = cluster["ccs"]
+collection = db["ifm_mapper_config_data"]
+wb = openpyxl.load_workbook("excelToMongoDB/domain_config_data.xlsx")
 sheets = wb.sheetnames
 S = len(sheets)
 
@@ -31,30 +30,29 @@ for s in range(0, S):
     sheetName = sheets[s]
     R = currWorkbook.max_row
     for r in range(1, R+1):
-        key2 = camelCase(sheets[s])
-        key3 = camelCase(currWorkbook.cell(r, 1).value)
-        code = camelCase(currWorkbook.cell(r, 1).value)
-        displayName = currWorkbook.cell(r, 2).value
+        count = count + 1
+        sourceAttribute = currWorkbook.cell(r, 3).value
+        reconAttribute = currWorkbook.cell(r, 3).value
+        required = currWorkbook.cell(r, 5).value
         domainId = camelCase(sheets[s])
         interface = {
             "key1": "insrd",
-            "key2": key2,
-            "key3": key3,
+            "key2": domainId,
             "isActive": True,
             "data": {
-                    "domainId": domainId,
-                    "type": "static",
-                    "code": code,
-                    "displayName": displayName,
-                    "datatype": "String",
+                    "sourceAttribute": sourceAttribute,
+                    "reconAttribute": reconAttribute,
                     "config": {
-                        "dataSourceUrl": ""
+                        "validation": {
+                            "required": required
+                        }
                     }
             }
         }
+        print(count)
+        print(sourceAttribute)
         collection.insert_one(interface)
-        count = count + 1
-    print(domainId + " done!")
 
 
-print("Total " + str(count) + " document objects inserted successfully! ")
+print("Total objects inserted : ")
+print(count)
